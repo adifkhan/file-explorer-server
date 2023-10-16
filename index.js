@@ -37,7 +37,31 @@ async function run() {
     ); 
     */
 
-    const folderCollection = client.db("explorer").collection("folderdata");
+    const folderCollection = client.db("explorer").collection("folders");
+
+    // POST new folder
+    app.put("/createfolder/:folderId", async (req, res) => {
+      const folder = req.body;
+      //   const folderId = req.params.folderId;
+      const filter = { folderName: folder.folderName };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: folder,
+      };
+      const result = await folderCollection.updateOne(
+        filter,
+        updatedDoc,
+        options
+      );
+      res.send(result);
+    });
+
+    // GET folders
+    app.get("/folders", async (req, res) => {
+      const query = {};
+      const result = await folderCollection.find(query).toArray();
+      res.send(result);
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();

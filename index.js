@@ -6,14 +6,10 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 5000;
 
-// myfileexplorer
-// GVtwJu8lHNdD7QRt
-
 app.use(cors());
 app.use(express.json());
 
 // mongodb connection //
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.eqqwutk.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -39,14 +35,14 @@ async function run() {
 
     const folderCollection = client.db("explorer").collection("folders");
 
-    // POST new folder
-    app.put("/createfolder/:folderId", async (req, res) => {
+    // PUT  folder
+    app.put("/folder", async (req, res) => {
       const folder = req.body;
-      //   const folderId = req.params.folderId;
-      const filter = { folderName: folder.folderName };
+      const explorer = { name: folder.name, explorer: folder.explorer };
+      const filter = { _id: new ObjectId(folder._id) };
       const options = { upsert: true };
       const updatedDoc = {
-        $set: folder,
+        $set: explorer,
       };
       const result = await folderCollection.updateOne(
         filter,
@@ -56,8 +52,8 @@ async function run() {
       res.send(result);
     });
 
-    // GET folders
-    app.get("/folders", async (req, res) => {
+    // GET folder
+    app.get("/folder", async (req, res) => {
       const query = {};
       const result = await folderCollection.find(query).toArray();
       res.send(result);
@@ -70,7 +66,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get("/", (req, res) => {
-  res.send("Hello from File Explorer!");
+  res.send("Hello from Explorer!");
 });
 
 app.listen(port, () => {
